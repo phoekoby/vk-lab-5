@@ -1,16 +1,21 @@
 package org.example.dao;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 public interface CrudDAO<V, K> {
-    List<V> getAll();
+    Collection<V> getAll();
 
-    Optional<V> getById(K id);
+    Optional<V> getById(@NotNull K id);
 
-    void delete(K id);
+    void delete(@NotNull K id);
 
-    V update(V value);
+    V update(@NotNull V value);
 
-    V save(V value);
+    V save(@NotNull V value);
+
+    Collection<V> saveAll(@NotNull Collection<V> values);
 }

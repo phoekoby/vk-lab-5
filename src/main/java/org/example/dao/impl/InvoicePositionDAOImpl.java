@@ -2,7 +2,9 @@ package org.example.dao.impl;
 
 import org.example.dao.InvoicePositionDAO;
 import org.example.entity.InvoicePosition;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,22 +15,27 @@ public class InvoicePositionDAOImpl implements InvoicePositionDAO {
     }
 
     @Override
-    public Optional<InvoicePosition> getById(Long id) {
+    public Optional<InvoicePosition> getById(@NotNull Long id) {
         return Optional.empty();
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(@NotNull Long id) {
 
     }
 
     @Override
-    public InvoicePosition update(InvoicePosition value) {
+    public InvoicePosition update(@NotNull InvoicePosition value) {
         return null;
     }
 
     @Override
-    public InvoicePosition save(InvoicePosition value) {
+    public InvoicePosition save(@NotNull InvoicePosition value) {
+        return null;
+    }
+
+    @Override
+    public Collection<InvoicePosition> saveAll(@NotNull Collection<InvoicePosition> values) {
         return null;
     }
 }
