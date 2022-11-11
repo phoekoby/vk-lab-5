@@ -1,3 +1,4 @@
+--Выбрать первые 10 поставщиков по количеству поставленного товара
 SELECT *
 FROM organization org
 ORDER BY (SELECT coalesce(sum(amount), 0)
@@ -9,7 +10,8 @@ ORDER BY (SELECT coalesce(sum(amount), 0)
 LIMIT 2;
 
 
-
+--Выбрать поставщиков с количеством поставленного товара
+-- выше указанного значения (товар и его количество должны допускать множественное указание).
 SELECT *
 FROM organization org
 WHERE ((SELECT coalesce(sum(amount), 0)
@@ -26,6 +28,8 @@ WHERE ((SELECT coalesce(sum(amount), 0)
              where org.id = inv.sender_id) and product_id = 2) > 10000);
 
 
+--За каждый день для каждого товара рассчитать количество и
+-- сумму полученного товара в указанном периоде, посчитать итоги за период
 
 SELECT i.invoice_data,
        p.id                      as product_id,
@@ -40,8 +44,6 @@ WHERE i.invoice_data >= '2022-11-09'
   AND i.invoice_data <= '2022-11-12'
 GROUP BY i.invoice_data, p.id;
 
-
-
 SELECT p.id, p.internal_code, p.name, sum(ip.amount) as amount, sum(ip.amount * ip.price) as sum
 FROM invoice_position ip
          LEFT JOIN product p on p.id = ip.product_id
@@ -51,6 +53,7 @@ WHERE i.invoice_data >= '2022-11-09'
 GROUP BY p.id;
 
 
+--Рассчитать среднюю цену полученного товара за период
 SELECT avg(ip.price)
 FROM invoice_position ip
          RIGHT JOIN invoice i on i.id = ip.invoice_id
