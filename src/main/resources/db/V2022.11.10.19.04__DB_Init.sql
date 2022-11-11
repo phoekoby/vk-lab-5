@@ -10,14 +10,14 @@ CREATE TABLE PRODUCT
     id            BIGSERIAL PRIMARY KEY,
     name          varchar(64) NOT NULL,
     internal_code int8        NOT NULL
-)
+);
 
 
 CREATE TABLE INVOICE
 (
     id           BIGSERIAL PRIMARY KEY,
-    number       int8                                                                 NOT NULL,
-    invoice_data timestamp                                                            NOT NULL,
+    number       int8                                                                  NOT NULL,
+    invoice_data timestamp                                                             NOT NULL,
     sender_id    int8 references ORGANIZATION (id) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL
 );
 
@@ -25,8 +25,9 @@ CREATE TABLE INVOICE
 CREATE TABLE INVOICE_POSITION
 (
     id         BIGSERIAL PRIMARY KEY,
-    price      float                                                           NOT NULL,
+    price      float                                                            NOT NULL,
     product_id int8 references PRODUCT (id) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
-    amount     int                                                             NOT NULL default value (1)
+    amount     int                                                              NOT NULL DEFAULT 1,
+    invoice_id int8 references INVOICE (id) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL
 )
 
