@@ -2,40 +2,135 @@ package org.example.dao.impl;
 
 import org.example.dao.InvoiceDAO;
 import org.example.entity.Invoice;
+import org.example.entity.Organization;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.sql.Date;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
+
+import static org.example.config.DbCredentials.*;
+import static org.example.config.DbCredentials.PASSWORD;
 
 public class InvoiceDAOImpl implements InvoiceDAO {
+    private final String sqlGetAllInvoices = "SELECT * FROM invoice;";
+
+    private final String sqlGetByIdInvoice = """
+            SELECT * FROM invoice where id=?;
+            """;
+
+    private final String sqlDeleteInvoiceById = """
+            DELETE FROM invoice where id=?;
+            """;
+
+    private final String sqlUpdateInvoice = """
+            UPDATE invoice SET number=?, invoice_date=?, sender_id=? WHERE id=?;
+             """;
+
+    private final String sqlInsert = """
+            INSERT INTO invoice(number, invoice_date, sender_id)  VALUES (?, ?, ?);
+            """;
+
     @Override
     public List<Invoice> getAll() {
-        return null;
+
+        try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
+            try (PreparedStatement statement = connection.prepareStatement(sqlGetAllInvoices)) {
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    return collectToListInvoices(resultSet);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public Optional<Invoice> getById(@NotNull Long id) {
-        return Optional.empty();
+        try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
+            try (PreparedStatement statement = connection.prepareStatement(sqlGetByIdInvoice)) {
+                statement.setLong(0, id);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    Invoice invoice = null;
+                    while (resultSet.next()) {
+                        final Long id0 = resultSet.getLong("id");
+                        final Long number = resultSet.getLong("number");
+                        final Date invoiceDate = resultSet.getDate("invoice_date");
+                        final Long senderId = resultSet.getLong("sender_id");
+                        invoice = new Invoice(id0, number, invoiceDate, senderId);
+                    }
+                    return Optional.ofNullable(invoice);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void delete(@NotNull Long id) {
-
+        try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
+            try (PreparedStatement statement = connection.prepareStatement(sqlDeleteInvoiceById)) {
+                statement.setLong(0, id);
+                statement.execute();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public Invoice update(@NotNull Invoice value) {
-        return null;
+        try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
+            try (PreparedStatement statement = connection.prepareStatement(sqlUpdateInvoice)) {
+                statement.setLong(1, value.getNumber());
+                statement.setDate(2, value.getInvoiceDate());
+                statement.setLong(3, value.getSenderId());
+                statement.executeUpdate();
+                return value;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public Invoice save(@NotNull Invoice value) {
-        return null;
+        try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
+            try (PreparedStatement statement = connection.prepareStatement(sqlInsert)) {
+                statement.setLong(1, value.getNumber());
+                statement.setDate(2, value.getInvoiceDate());
+                statement.setLong(3, value.getSenderId());
+                statement.executeUpdate();
+                return value;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public Collection<Invoice> saveAll(@NotNull Collection<Invoice> values) {
-        return null;
+        Collection<Invoice> result = new ArrayList<>();
+        for (Invoice value : values) {
+            result.add(save(value));
+        }
+        return result;
+    }
+
+
+    private List<Invoice> collectToListInvoices(ResultSet resultSet) throws SQLException {
+        List<Invoice> result = new ArrayList<>();
+        while (resultSet.next()) {
+            final Long id = resultSet.getLong("id");
+            final Long number = resultSet.getLong("number");
+            final Date invoiceDate = resultSet.getDate("invoice_date");
+            final Long senderId = resultSet.getLong("sender_id");
+            result.add(new Invoice(id, number, invoiceDate, senderId));
+        }
+        return result;
     }
 }
