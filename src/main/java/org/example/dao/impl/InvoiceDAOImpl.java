@@ -34,7 +34,6 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 
     @Override
     public List<Invoice> getAll() {
-
         try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
             try (PreparedStatement statement = connection.prepareStatement(sqlGetAllInvoices)) {
                 try (ResultSet resultSet = statement.executeQuery()) {
@@ -82,11 +81,15 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 
     @Override
     public Invoice update(@NotNull Invoice value) {
+        if(value.getId() == null || getById(value.getId()).isEmpty()){
+            throw new IllegalArgumentException("Row with this id is not existing");
+        }
         try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
             try (PreparedStatement statement = connection.prepareStatement(sqlUpdateInvoice)) {
                 statement.setLong(1, value.getNumber());
                 statement.setDate(2, value.getInvoiceDate());
                 statement.setLong(3, value.getSenderId());
+                statement.setLong(4, value.getId());
                 statement.executeUpdate();
                 return value;
             }

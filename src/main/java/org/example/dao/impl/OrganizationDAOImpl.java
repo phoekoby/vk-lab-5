@@ -112,6 +112,9 @@ public class OrganizationDAOImpl implements OrganizationDAO {
 
     @Override
     public Organization update(@NotNull Organization value) {
+        if(value.getId() == null || getById(value.getId()).isEmpty()){
+            throw new IllegalArgumentException("Row with this id is not existing");
+        }
         try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
             try (PreparedStatement statement = connection.prepareStatement(sqlUpdateOrganization)) {
                 statement.setLong(1, value.getINN());

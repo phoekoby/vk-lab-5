@@ -17,7 +17,6 @@ import static org.example.config.DbCredentials.*;
 @SuppressWarnings("FieldCanBeLocal")
 public class ProductDAOImpl implements ProductDAO {
 
-
     private final String sqlGetAllProducts = "SELECT * FROM product;";
 
     private final String sqlGetByIdProduct = """
@@ -135,6 +134,9 @@ public class ProductDAOImpl implements ProductDAO {
 
     @Override
     public Product update(@NotNull Product value) {
+        if(value.getId() == null || getById(value.getId()).isEmpty()){
+            throw new IllegalArgumentException("Row with this id is not existing");
+        }
         try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
             try (PreparedStatement statement = connection.prepareStatement(sqlUpdateProduct)) {
                 statement.setString(1, value.getName());

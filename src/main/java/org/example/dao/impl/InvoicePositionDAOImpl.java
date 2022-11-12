@@ -86,6 +86,9 @@ public class InvoicePositionDAOImpl implements InvoicePositionDAO {
 
     @Override
     public InvoicePosition update(@NotNull InvoicePosition value) {
+        if(value.getId() == null || getById(value.getId()).isEmpty()){
+            throw new IllegalArgumentException("Row with this id is not existing");
+        }
         try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
             try (PreparedStatement statement = connection.prepareStatement(sqlUpdateInvoicePosition)) {
                 statement.setDouble(1, value.getPrice());
