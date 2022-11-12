@@ -1,19 +1,21 @@
 package org.example.dao.impl;
 
 import org.example.dao.InvoicePositionDAO;
-import org.example.entity.Invoice;
 import org.example.entity.InvoicePosition;
 import org.jetbrains.annotations.NotNull;
 
-import java.sql.*;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 import static org.example.config.DbCredentials.*;
-import static org.example.config.DbCredentials.PASSWORD;
 
+@SuppressWarnings("FieldCanBeLocal")
 public class InvoicePositionDAOImpl implements InvoicePositionDAO {
 
     private final String sqlGetAllInvoicePosition = "SELECT * FROM invoice_position;";

@@ -1,17 +1,16 @@
 package org.example.dao.impl;
 
-import static org.example.config.DbCredentials.*;
-
 import org.example.dao.OrganizationDAO;
 import org.example.entity.Organization;
 import org.jetbrains.annotations.NotNull;
-
 
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+
+import static org.example.config.DbCredentials.*;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class OrganizationDAOImpl implements OrganizationDAO {
@@ -175,7 +174,7 @@ public class OrganizationDAOImpl implements OrganizationDAO {
                     ";";
 
             try (PreparedStatement statement = connection.prepareStatement(resultSql)) {
-                int index = 0;
+                int index = 1;
                 for (Map.Entry<Long, Integer> entry : entries) {
                     statement.setLong(index, entry.getKey());
                     statement.setLong(index + 1, entry.getValue());

@@ -42,7 +42,8 @@ FROM invoice_position ip
          RIGHT JOIN invoice i on i.id = ip.invoice_id
 WHERE i.invoice_date >= '2022-11-09'
   AND i.invoice_date <= '2022-11-12'
-GROUP BY i.invoice_date, p.id;
+GROUP BY i.invoice_date, p.id
+ORDER BY i.invoice_date;
 
 SELECT p.id, p.internal_code, p.name, sum(ip.amount) as amount, sum(ip.amount * ip.price) as sum
 FROM invoice_position ip

@@ -23,6 +23,10 @@ dependencies {
     implementation("org.flywaydb:flyway-core:9.7.0")
     // https://mvnrepository.com/artifact/com.google.inject/guice
     implementation("com.google.inject:guice:5.1.0")
+
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    implementation("org.apache.commons:commons-lang3:3.12.0")
+
 }
 
 tasks.getByName<Test>("test") {
