@@ -10,4 +10,5 @@ public final class InvoicePosition implements Serializable {
     private final Double price;
     private final Integer amount;
     private final Long productId;
+    private final Long invoiceId;
 }

@@ -52,7 +52,7 @@ public class InvoiceDAOImpl implements InvoiceDAO {
     public Optional<Invoice> getById(@NotNull Long id) {
         try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
             try (PreparedStatement statement = connection.prepareStatement(sqlGetByIdInvoice)) {
-                statement.setLong(0, id);
+                statement.setLong(1, id);
                 try (ResultSet resultSet = statement.executeQuery()) {
                     Invoice invoice = null;
                     while (resultSet.next()) {
@@ -74,7 +74,7 @@ public class InvoiceDAOImpl implements InvoiceDAO {
     public void delete(@NotNull Long id) {
         try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
             try (PreparedStatement statement = connection.prepareStatement(sqlDeleteInvoiceById)) {
-                statement.setLong(0, id);
+                statement.setLong(1, id);
                 statement.execute();
             }
         } catch (SQLException e) {

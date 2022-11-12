@@ -31,7 +31,7 @@ WHERE ((SELECT coalesce(sum(amount), 0)
 --За каждый день для каждого товара рассчитать количество и
 -- сумму полученного товара в указанном периоде, посчитать итоги за период
 
-SELECT i.invoice_data,
+SELECT i.invoice_date,
        p.id                      as product_id,
        p.internal_code,
        p.name,
@@ -40,16 +40,16 @@ SELECT i.invoice_data,
 FROM invoice_position ip
          LEFT JOIN product p on p.id = ip.product_id
          RIGHT JOIN invoice i on i.id = ip.invoice_id
-WHERE i.invoice_data >= '2022-11-09'
-  AND i.invoice_data <= '2022-11-12'
-GROUP BY i.invoice_data, p.id;
+WHERE i.invoice_date >= '2022-11-09'
+  AND i.invoice_date <= '2022-11-12'
+GROUP BY i.invoice_date, p.id;
 
 SELECT p.id, p.internal_code, p.name, sum(ip.amount) as amount, sum(ip.amount * ip.price) as sum
 FROM invoice_position ip
          LEFT JOIN product p on p.id = ip.product_id
          RIGHT JOIN invoice i on i.id = ip.invoice_id
-WHERE i.invoice_data >= '2022-11-09'
-  AND i.invoice_data <= '2022-11-12'
+WHERE i.invoice_date >= '2022-11-09'
+  AND i.invoice_date <= '2022-11-12'
 GROUP BY p.id;
 
 
@@ -58,15 +58,15 @@ SELECT avg(ip.price)
 FROM invoice_position ip
          RIGHT JOIN invoice i on i.id = ip.invoice_id
 WHERE ip.product_id = 1
-  AND i.invoice_data >= '2022-11-09'
-  AND i.invoice_data <= '2022-11-12';
+  AND i.invoice_date >= '2022-11-09'
+  AND i.invoice_date <= '2022-11-12';
 
 SELECT p.id, p.name, p.internal_code, avg(ip.price)
 FROM invoice_position ip
          LEFT JOIN product p on p.id = ip.product_id
          RIGHT JOIN invoice i on i.id = ip.invoice_id
-WHERE i.invoice_data >= '2022-11-09'
-  AND i.invoice_data <= '2022-11-12'
+WHERE i.invoice_date >= '2022-11-09'
+  AND i.invoice_date <= '2022-11-12'
 GROUP BY p.id;
 
 
@@ -82,8 +82,8 @@ SELECT o.id,
                              FROM invoice_position ip
                              WHERE ip.invoice_id in (SELECT i.id
                                                      FROM invoice i
-                                                     WHERE i.invoice_data >= '2022-11-09'
-                                                       AND i.invoice_data <= '2022-11-11'
+                                                     WHERE i.invoice_date >= '2022-11-09'
+                                                       AND i.invoice_date <= '2022-11-11'
                                                        AND i.sender_id = o.id)))) as products
 FROM organization o;
 

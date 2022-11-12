@@ -82,7 +82,7 @@ public class OrganizationDAOImpl implements OrganizationDAO {
     public Optional<Organization> getById(@NotNull Long id) {
         try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
             try (PreparedStatement statement = connection.prepareStatement(sqlGetByIdOrganization)) {
-                statement.setLong(0, id);
+                statement.setLong(1, id);
                 try (ResultSet resultSet = statement.executeQuery()) {
                     Organization organization = null;
                     while (resultSet.next()) {
@@ -103,7 +103,7 @@ public class OrganizationDAOImpl implements OrganizationDAO {
     public void delete(@NotNull Long id) {
         try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
             try (PreparedStatement statement = connection.prepareStatement(sqlDeleteOrganizationById)) {
-                statement.setLong(0, id);
+                statement.setLong(1, id);
                 statement.execute();
             }
         } catch (SQLException e) {
@@ -153,7 +153,7 @@ public class OrganizationDAOImpl implements OrganizationDAO {
     public List<Organization> findFirst10OrganizationsByProduct(@NotNull Long productId) {
         try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
             try (PreparedStatement statement = connection.prepareStatement(sqlFindFirst10OrganizationsByProduct)) {
-                statement.setLong(0, productId);
+                statement.setLong(1, productId);
                 try (ResultSet resultSet = statement.executeQuery()) {
                     return collectToListOrganizations(resultSet);
                 }
