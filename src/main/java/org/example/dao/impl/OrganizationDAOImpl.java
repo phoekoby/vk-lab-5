@@ -1,5 +1,7 @@
 package org.example.dao.impl;
 
+import com.google.inject.Inject;
+import org.example.config.DBCredentials;
 import org.example.dao.OrganizationDAO;
 import org.example.entity.Organization;
 import org.jetbrains.annotations.NotNull;
@@ -10,7 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-import static org.example.config.DbCredentials.*;
+import static org.example.config.DbConstants.*;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class OrganizationDAOImpl implements OrganizationDAO {
@@ -64,9 +66,16 @@ public class OrganizationDAOImpl implements OrganizationDAO {
                          where org.id = inv.sender_id) and product_id = ?) > ?)
             """;
 
+    private final DBCredentials dbCredentials;
+
+    @Inject
+    public OrganizationDAOImpl(DBCredentials dbCredentials) {
+        this.dbCredentials = dbCredentials;
+    }
     @Override
     public Collection<Organization> getAll() {
-        try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
+        try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
+                dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlGetAllOrganizations)) {
                 try (ResultSet resultSet = statement.executeQuery()) {
                     return collectToListOrganizations(resultSet);
@@ -79,7 +88,8 @@ public class OrganizationDAOImpl implements OrganizationDAO {
 
     @Override
     public Optional<Organization> getById(@NotNull Long id) {
-        try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
+        try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
+                dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlGetByIdOrganization)) {
                 statement.setLong(1, id);
                 try (ResultSet resultSet = statement.executeQuery()) {
@@ -100,7 +110,8 @@ public class OrganizationDAOImpl implements OrganizationDAO {
 
     @Override
     public void delete(@NotNull Long id) {
-        try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
+        try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
+                dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlDeleteOrganizationById)) {
                 statement.setLong(1, id);
                 statement.execute();
@@ -115,7 +126,8 @@ public class OrganizationDAOImpl implements OrganizationDAO {
         if(value.getId() == null || getById(value.getId()).isEmpty()){
             throw new IllegalArgumentException("Row with this id is not existing");
         }
-        try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
+        try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
+                dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlUpdateOrganization)) {
                 statement.setLong(1, value.getINN());
                 statement.setLong(2, value.getCheckingAccount());
@@ -130,7 +142,8 @@ public class OrganizationDAOImpl implements OrganizationDAO {
 
     @Override
     public Organization save(@NotNull Organization value) {
-        try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
+        try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
+                dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlInsert)) {
                 statement.setLong(1, value.getINN());
                 statement.setLong(2, value.getCheckingAccount());
@@ -153,7 +166,8 @@ public class OrganizationDAOImpl implements OrganizationDAO {
 
     @Override
     public List<Organization> findFirst10OrganizationsByProduct(@NotNull Long productId) {
-        try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
+        try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
+                dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlFindFirst10OrganizationsByProduct)) {
                 statement.setLong(1, productId);
                 try (ResultSet resultSet = statement.executeQuery()) {
@@ -170,7 +184,8 @@ public class OrganizationDAOImpl implements OrganizationDAO {
         if (productsWithLimits.isEmpty()) {
             throw new IllegalArgumentException("Request can not be with empty limits");
         }
-        try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
+        try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
+                dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             Set<Map.Entry<Long, Integer>> entries = productsWithLimits.entrySet();
             final String resultSql = sqlFindOrganizationAmountProductMoreThanValue +
                     secondPartOfSqlFindOrganizationAmountProductMoreThanValue.repeat(Math.max(0, entries.size() - 1)) +

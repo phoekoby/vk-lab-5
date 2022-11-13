@@ -54,56 +54,56 @@ public class InvoicePositionsDAOTest extends AbstractDataBaseTest{
         invoicePosition1 = invoicePositionDAO.getById(existingInvoicePositionId);
         assertTrue(invoicePosition1.isEmpty());
     }
-//TODO: доделать
+
     @Test
     public void update() {
-        Invoice existingInvoice = new Invoice(1L, 1L, Date.valueOf("2022-11-09"), 1L);
-        Invoice existingChangedInvoice = new Invoice(1L, 1L, Date.valueOf("2022-11-11"), 2L);
-        Invoice notExistingInvoice = new Invoice(7L, 1L, Date.valueOf("2022-11-09"), 1L);
+        InvoicePosition existingInvoicePosition =  new InvoicePosition(1L, 100.0, 1000, 1L, 1L);
+        InvoicePosition existingChangedInvoicePosition =  new InvoicePosition(1L, 120.0, 1100, 1L, 1L);
+        InvoicePosition notExistingInvoice = new InvoicePosition(13L, 120.0, 1100, 1L, 1L);
 
-        Optional<Invoice> invoice1 = invoiceDAO.getById(existingInvoice.getId());
+        Optional<InvoicePosition> invoice1 = invoicePositionDAO.getById(existingInvoicePosition.getId());
         assertTrue(invoice1.isPresent());
-        assertEquals(existingInvoice, invoice1.get());
-        invoiceDAO.update(existingChangedInvoice);
-        invoice1 = invoiceDAO.getById(existingInvoice.getId());
+        assertEquals(existingInvoicePosition, invoice1.get());
+        invoicePositionDAO.update(existingChangedInvoicePosition);
+        invoice1 = invoicePositionDAO.getById(existingInvoicePosition.getId());
         assertTrue(invoice1.isPresent());
-        assertEquals(invoice1.get(), existingChangedInvoice);
+        assertEquals(invoice1.get(), existingChangedInvoicePosition);
 
-        assertThrows(IllegalArgumentException.class, () -> invoiceDAO.update(notExistingInvoice));
+        assertThrows(IllegalArgumentException.class, () -> invoicePositionDAO.update(notExistingInvoice));
     }
 
     @Test
     public void saveInvoicePositions() {
-        Invoice notExistingInvoice = new Invoice(7L, 1L, Date.valueOf("2022-11-09"), 1L);
-        Optional<Invoice> invoice = invoiceDAO.getById(7L);
+        InvoicePosition notExistingInvoicePosition = new InvoicePosition(13L, 120.0, 1100, 1L, 1L);
+        Optional<InvoicePosition> invoice = invoicePositionDAO.getById(13L);
         assertTrue(invoice.isEmpty());
 
-        invoiceDAO.save(notExistingInvoice);
-        invoice = invoiceDAO.getById(7L);
+        invoicePositionDAO.save(notExistingInvoicePosition);
+        invoice = invoicePositionDAO.getById(13L);
         assertTrue(invoice.isPresent());
-        assertEquals(invoice.get(), notExistingInvoice);
+        assertEquals(invoice.get(), notExistingInvoicePosition);
     }
 
     @Test
     public void saveAllInvoicesPositions() {
-        int sizeDbShouldBeAfterSaving = 8;
-        Invoice notExistingInvoice1 = new Invoice(7L, 1L, Date.valueOf("2022-11-09"), 1L);
-        Invoice notExistingInvoice2 = new Invoice(8L, 1L, Date.valueOf("2022-11-09"), 1L);
-        Collection<Invoice> notExistingInvoices = List.of(notExistingInvoice2, notExistingInvoice1);
-        Optional<Invoice> invoice1 = invoiceDAO.getById(7L);
-        Optional<Invoice> invoice2 = invoiceDAO.getById(8L);
+        int sizeDbShouldBeAfterSaving = 14;
+        InvoicePosition notExistingInvoicePosition1 =new InvoicePosition(13L, 120.0, 1100, 1L, 1L);
+        InvoicePosition notExistingInvoicePosition2 = new InvoicePosition(14L, 120.0, 1100, 1L, 1L);
+        Collection<InvoicePosition> notExistingInvoicePositions = List.of(notExistingInvoicePosition2, notExistingInvoicePosition1);
+        Optional<InvoicePosition> invoice1 = invoicePositionDAO.getById(13L);
+        Optional<InvoicePosition> invoice2 = invoicePositionDAO.getById(14L);
         assertTrue(invoice1.isEmpty());
         assertTrue(invoice2.isEmpty());
 
-        Collection<Invoice> result = invoiceDAO.saveAll(notExistingInvoices);
-        for (Invoice i: notExistingInvoices) {
-            Optional<Invoice> invoice = invoiceDAO.getById(i.getId());
+        Collection<InvoicePosition> result = invoicePositionDAO.saveAll(notExistingInvoicePositions);
+        for (InvoicePosition i: notExistingInvoicePositions) {
+            Optional<InvoicePosition> invoice = invoicePositionDAO.getById(i.getId());
             assertTrue(invoice.isPresent());
-            assertTrue(notExistingInvoices.contains(invoice.get()));
+            assertTrue(notExistingInvoicePositions.contains(invoice.get()));
             assertTrue(result.contains(invoice.get()));
         }
-        assertEquals(result.size(), notExistingInvoices.size());
-        assertEquals(sizeDbShouldBeAfterSaving, invoiceDAO.getAll().size());
+        assertEquals(result.size(), notExistingInvoicePositions.size());
+        assertEquals(sizeDbShouldBeAfterSaving, invoicePositionDAO.getAll().size());
     }
 
 }

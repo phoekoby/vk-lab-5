@@ -11,8 +11,9 @@ import java.util.Map;
 
 public class Main {
     public static void main(String[] args) {
-        MigrationService.createMigrations();
         Injector injector = Guice.createInjector(new ManagementModule());
+        MigrationService migrationService = injector.getInstance(MigrationService.class);
+        migrationService.createMigrations();
         ManagementService managementService = injector.getInstance(ManagementService.class);
         managementService.printAllProducts();
         managementService.printAllInvoices();

@@ -10,14 +10,19 @@ import org.example.dao.impl.InvoicePositionDAOImpl;
 import org.example.dao.impl.OrganizationDAOImpl;
 import org.example.dao.impl.ProductDAOImpl;
 import org.example.service.ManagementService;
+import org.example.service.MigrationService;
+
+import static org.example.config.DbConstants.*;
 
 public class ManagementModule extends AbstractModule {
     @Override
     protected void configure() {
+        bind(MigrationService.class);
         bind(InvoiceDAO.class).to(InvoiceDAOImpl.class);
         bind(InvoicePositionDAO.class).to(InvoicePositionDAOImpl.class);
         bind(OrganizationDAO.class).to(OrganizationDAOImpl.class);
         bind(ProductDAO.class).to(ProductDAOImpl.class);
         bind(ManagementService.class);
+        bind(DBCredentials.class).toInstance(new DBCredentials(CONNECTION, DB_NAME, USERNAME, PASSWORD));
     }
 }

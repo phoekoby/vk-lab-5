@@ -1,27 +1,34 @@
 package config;
 
+import com.google.inject.Inject;
+import org.example.config.DBCredentials;
 import org.flywaydb.core.Flyway;
 
-import static org.example.config.DbCredentials.*;
-import static org.example.config.DbCredentials.PASSWORD;
+import static org.example.config.DbConstants.*;
+import static org.example.config.DbConstants.PASSWORD;
 
 public class TestMigrationService {
-    private TestMigrationService() {
-    }
+    private final DBCredentials dbCredentials;
 
-    public static void initializeDb() {
+    @Inject
+    public TestMigrationService(DBCredentials dbCredentials) {
+        this.dbCredentials = dbCredentials;
+    }
+    public void initializeDb() {
         final var flyway = Flyway
                 .configure()
-                .dataSource(CONNECTION + DB_NAME, USERNAME, PASSWORD)
+                .dataSource(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
+                        dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())
                 .locations("db")
                 .load();
         flyway.migrate();
     }
 
-    public static void cleanDb(){
+    public void cleanDb(){
         final var flyway = Flyway
                 .configure()
-                .dataSource(CONNECTION + DB_NAME, USERNAME, PASSWORD)
+                .dataSource(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
+                        dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())
                 .cleanDisabled(false)
                 .locations("db")
                 .load();

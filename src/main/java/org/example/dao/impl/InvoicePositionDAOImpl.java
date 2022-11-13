@@ -1,5 +1,7 @@
 package org.example.dao.impl;
 
+import com.google.inject.Inject;
+import org.example.config.DBCredentials;
 import org.example.dao.InvoicePositionDAO;
 import org.example.entity.InvoicePosition;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +15,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import static org.example.config.DbCredentials.*;
+import static org.example.config.DbConstants.*;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class InvoicePositionDAOImpl implements InvoicePositionDAO {
@@ -29,16 +31,22 @@ public class InvoicePositionDAOImpl implements InvoicePositionDAO {
             """;
 
     private final String sqlUpdateInvoicePosition = """
-            UPDATE invoice_position SET price=?,amount=?, product_id=?, invoice_id=?WHERE id=?;
+            UPDATE invoice_position SET price=?,amount=?, product_id=?, invoice_id=? WHERE id=?;
              """;
 
     private final String sqlInsert = """
             INSERT INTO invoice_position(price,amount, product_id, invoice_id) VALUES (?, ?, ?, ?);
             """;
+    private final DBCredentials dbCredentials;
 
+    @Inject
+    public InvoicePositionDAOImpl(DBCredentials dbCredentials) {
+        this.dbCredentials = dbCredentials;
+    }
     @Override
     public List<InvoicePosition> getAll() {
-        try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
+        try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
+                dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlGetAllInvoicePosition)) {
                 try (ResultSet resultSet = statement.executeQuery()) {
                     return collectToListInvoicePositions(resultSet);
@@ -51,7 +59,8 @@ public class InvoicePositionDAOImpl implements InvoicePositionDAO {
 
     @Override
     public Optional<InvoicePosition> getById(@NotNull Long id) {
-        try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
+        try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
+                dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlGetByIdInvoicePosition)) {
                 statement.setLong(1, id);
                 try (ResultSet resultSet = statement.executeQuery()) {
@@ -74,7 +83,8 @@ public class InvoicePositionDAOImpl implements InvoicePositionDAO {
 
     @Override
     public void delete(@NotNull Long id) {
-        try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
+        try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
+                dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlDeleteInvoicePositionById)) {
                 statement.setLong(1, id);
                 statement.execute();
@@ -89,12 +99,14 @@ public class InvoicePositionDAOImpl implements InvoicePositionDAO {
         if(value.getId() == null || getById(value.getId()).isEmpty()){
             throw new IllegalArgumentException("Row with this id is not existing");
         }
-        try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
+        try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
+                dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlUpdateInvoicePosition)) {
                 statement.setDouble(1, value.getPrice());
                 statement.setInt(2, value.getAmount());
                 statement.setLong(3, value.getProductId());
                 statement.setLong(4, value.getInvoiceId());
+                statement.setLong(5, value.getId());
                 statement.executeUpdate();
                 return value;
             }
@@ -105,7 +117,8 @@ public class InvoicePositionDAOImpl implements InvoicePositionDAO {
 
     @Override
     public InvoicePosition save(@NotNull InvoicePosition value) {
-        try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
+        try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
+                dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlInsert)) {
                 statement.setDouble(1, value.getPrice());
                 statement.setInt(2, value.getAmount());

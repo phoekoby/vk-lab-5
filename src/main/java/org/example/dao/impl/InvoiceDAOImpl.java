@@ -1,5 +1,7 @@
 package org.example.dao.impl;
 
+import com.google.inject.Inject;
+import org.example.config.DBCredentials;
 import org.example.dao.InvoiceDAO;
 import org.example.entity.Invoice;
 import org.jetbrains.annotations.NotNull;
@@ -10,7 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import static org.example.config.DbCredentials.*;
+import static org.example.config.DbConstants.*;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class InvoiceDAOImpl implements InvoiceDAO {
@@ -32,9 +34,17 @@ public class InvoiceDAOImpl implements InvoiceDAO {
             INSERT INTO invoice(number, invoice_date, sender_id)  VALUES (?, ?, ?);
             """;
 
+    private final DBCredentials dbCredentials;
+
+    @Inject
+    public InvoiceDAOImpl(DBCredentials dbCredentials) {
+        this.dbCredentials = dbCredentials;
+    }
+
     @Override
     public List<Invoice> getAll() {
-        try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
+        try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
+                dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlGetAllInvoices)) {
                 try (ResultSet resultSet = statement.executeQuery()) {
                     return collectToListInvoices(resultSet);
@@ -47,7 +57,8 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 
     @Override
     public Optional<Invoice> getById(@NotNull Long id) {
-        try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
+        try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
+                dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlGetByIdInvoice)) {
                 statement.setLong(1, id);
                 try (ResultSet resultSet = statement.executeQuery()) {
@@ -69,7 +80,8 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 
     @Override
     public void delete(@NotNull Long id) {
-        try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
+        try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
+                dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlDeleteInvoiceById)) {
                 statement.setLong(1, id);
                 statement.execute();
@@ -84,7 +96,8 @@ public class InvoiceDAOImpl implements InvoiceDAO {
         if(value.getId() == null || getById(value.getId()).isEmpty()){
             throw new IllegalArgumentException("Row with this id is not existing");
         }
-        try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
+        try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
+                dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlUpdateInvoice)) {
                 statement.setLong(1, value.getNumber());
                 statement.setDate(2, value.getInvoiceDate());
@@ -100,7 +113,8 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 
     @Override
     public Invoice save(@NotNull Invoice value) {
-        try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
+        try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
+                dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlInsert)) {
                 statement.setLong(1, value.getNumber());
                 statement.setDate(2, value.getInvoiceDate());

@@ -27,6 +27,10 @@ dependencies {
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation("org.apache.commons:commons-lang3:3.12.0")
 
+    // https://mvnrepository.com/artifact/com.opentable.components/otj-pg-embedded
+    testImplementation("com.opentable.components:otj-pg-embedded:1.0.1")
+
+
 }
 
 tasks.getByName<Test>("test") {

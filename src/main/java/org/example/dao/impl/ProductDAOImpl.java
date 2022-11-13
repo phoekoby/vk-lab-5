@@ -1,5 +1,7 @@
 package org.example.dao.impl;
 
+import com.google.inject.Inject;
+import org.example.config.DBCredentials;
 import org.example.dao.ProductDAO;
 import org.example.dto.AmountSumDTO;
 import org.example.dto.PeriodAmountSumAndResultProductDTO;
@@ -12,7 +14,7 @@ import java.sql.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.example.config.DbCredentials.*;
+import static org.example.config.DbConstants.*;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class ProductDAOImpl implements ProductDAO {
@@ -86,9 +88,18 @@ public class ProductDAOImpl implements ProductDAO {
             FROM organization o;
             """;
 
+
+    private final DBCredentials dbCredentials;
+
+    @Inject
+    public ProductDAOImpl(DBCredentials dbCredentials) {
+        this.dbCredentials = dbCredentials;
+    }
+
     @Override
     public List<Product> getAll() {
-        try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
+        try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
+                dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlGetAllProducts)) {
                 try (ResultSet resultSet = statement.executeQuery()) {
                     return collectToListProducts(resultSet);
@@ -101,7 +112,8 @@ public class ProductDAOImpl implements ProductDAO {
 
     @Override
     public Optional<Product> getById(@NotNull Long id) {
-        try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
+        try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
+                dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlGetByIdProduct)) {
                 statement.setLong(1, id);
                 try (ResultSet resultSet = statement.executeQuery()) {
@@ -122,7 +134,8 @@ public class ProductDAOImpl implements ProductDAO {
 
     @Override
     public void delete(@NotNull Long id) {
-        try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
+        try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
+                dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlDeleteProductById)) {
                 statement.setLong(1, id);
                 statement.execute();
@@ -134,10 +147,11 @@ public class ProductDAOImpl implements ProductDAO {
 
     @Override
     public Product update(@NotNull Product value) {
-        if(value.getId() == null || getById(value.getId()).isEmpty()){
+        if (value.getId() == null || getById(value.getId()).isEmpty()) {
             throw new IllegalArgumentException("Row with this id is not existing");
         }
-        try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
+        try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
+                dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlUpdateProduct)) {
                 statement.setString(1, value.getName());
                 statement.setLong(2, value.getInternalCode());
@@ -151,7 +165,8 @@ public class ProductDAOImpl implements ProductDAO {
 
     @Override
     public Product save(@NotNull Product value) {
-        try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
+        try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
+                dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlInsert)) {
                 statement.setString(1, value.getName());
                 statement.setLong(2, value.getInternalCode());
@@ -174,7 +189,8 @@ public class ProductDAOImpl implements ProductDAO {
 
     @Override
     public PeriodAmountSumAndResultProductDTO getAmountAndSumPerDayAndResultForPeriod(Date floor, Date roof) {
-        try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
+        try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
+                dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             final Map<Date, Map<Product, AmountSumDTO>> productPerDay = productPerDay(connection, floor, roof);
             final Map<Product, AmountSumDTO> amountSumResultForPeriod = amountSumResultForPeriod(connection, floor, roof);
             return new PeriodAmountSumAndResultProductDTO(productPerDay, amountSumResultForPeriod);
@@ -185,7 +201,8 @@ public class ProductDAOImpl implements ProductDAO {
 
     @Override
     public Map<Product, Double> getAveragePriceForProductsInPeriod(Date floor, Date roof) {
-        try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
+        try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
+                dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             final Map<Product, Double> productWithAveragePrice = new HashMap<>();
             try (PreparedStatement statement = connection.prepareStatement(sqlAveragePriceForProductInPeriod)) {
                 statement.setDate(1, floor);
@@ -206,9 +223,11 @@ public class ProductDAOImpl implements ProductDAO {
             throw new RuntimeException(e);
         }
     }
+
     @Override
     public Map<Organization, List<Product>> getDeliveredProductsByOrganizationInPeriod(Date floor, Date roof) {
-        try (var connection = DriverManager.getConnection(CONNECTION + DB_NAME, USERNAME, PASSWORD)) {
+        try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
+                dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             final Map<Organization, List<Product>> organizationsWithDeliveredProducts = new TreeMap<>();
             try (PreparedStatement statement = connection.prepareStatement(sqlOrganizationsWithDeliveredProducts)) {
                 statement.setDate(1, floor);
