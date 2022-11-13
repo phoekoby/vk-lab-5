@@ -1,13 +1,13 @@
 --Выбрать первые 10 поставщиков по количеству поставленного товара
 SELECT *
 FROM organization org
-ORDER BY (SELECT coalesce(sum(amount), 0)
+ORDER BY (SELECT coalesce(sum(amount), 0) res
           from invoice_position
           where invoice_id in
                 (SELECT id
                  from invoice inv
-                 where org.id = inv.sender_id) and product_id = 3) DESC
-LIMIT 2;
+                 where org.id = inv.sender_id) and product_id = 4) DESC
+LIMIT 10;
 
 
 --Выбрать поставщиков с количеством поставленного товара
@@ -19,13 +19,7 @@ WHERE ((SELECT coalesce(sum(amount), 0)
         where invoice_id in
               (SELECT id
                from invoice inv
-               where org.id = inv.sender_id) and product_id = 2) > 10000)
-  and ((SELECT coalesce(sum(amount), 0)
-      from invoice_position
-      where invoice_id in
-            (SELECT id
-             from invoice inv
-             where org.id = inv.sender_id) and product_id = 2) > 10000);
+               where org.id = inv.sender_id) and product_id = 1) > 9);
 
 
 --За каждый день для каждого товара рассчитать количество и
@@ -84,7 +78,7 @@ SELECT o.id,
                              WHERE ip.invoice_id in (SELECT i.id
                                                      FROM invoice i
                                                      WHERE i.invoice_date >= '2022-11-09'
-                                                       AND i.invoice_date <= '2022-11-11'
+                                                       AND i.invoice_date <= '2022-11-12'
                                                        AND i.sender_id = o.id)))) as products
 FROM organization o;
 

@@ -17,7 +17,7 @@ CREATE TABLE INVOICE
 (
     id           BIGSERIAL PRIMARY KEY,
     number       int8                                                                  NOT NULL,
-    invoice_date date                                                             NOT NULL,
+    invoice_date date                                                                  NOT NULL,
     sender_id    int8 references ORGANIZATION (id) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL
 );
 

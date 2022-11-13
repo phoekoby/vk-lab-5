@@ -12,8 +12,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import static org.example.config.DbConstants.*;
-
 @SuppressWarnings("FieldCanBeLocal")
 public class InvoiceDAOImpl implements InvoiceDAO {
     private final String sqlGetAllInvoices = "SELECT * FROM invoice;";

@@ -11,7 +11,6 @@ import org.example.dao.impl.InvoicePositionDAOImpl;
 import org.example.dao.impl.OrganizationDAOImpl;
 import org.example.dao.impl.ProductDAOImpl;
 import org.example.service.ManagementService;
-import org.example.service.MigrationService;
 
 import static config.TestDbConstants.*;
 

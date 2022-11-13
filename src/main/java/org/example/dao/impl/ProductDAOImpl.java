@@ -14,8 +14,6 @@ import java.sql.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.example.config.DbConstants.*;
-
 @SuppressWarnings("FieldCanBeLocal")
 public class ProductDAOImpl implements ProductDAO {
 
@@ -155,6 +153,7 @@ public class ProductDAOImpl implements ProductDAO {
             try (PreparedStatement statement = connection.prepareStatement(sqlUpdateProduct)) {
                 statement.setString(1, value.getName());
                 statement.setLong(2, value.getInternalCode());
+                statement.setLong(3, value.getId());
                 statement.executeUpdate();
                 return value;
             }

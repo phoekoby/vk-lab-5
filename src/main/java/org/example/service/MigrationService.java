@@ -4,8 +4,6 @@ import com.google.inject.Inject;
 import org.example.config.DBCredentials;
 import org.flywaydb.core.Flyway;
 
-import static org.example.config.DbConstants.*;
-
 public final class MigrationService {
 
     private final DBCredentials dbCredentials;

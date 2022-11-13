@@ -21,6 +21,7 @@ dependencies {
     implementation("org.postgresql:postgresql:42.5.0")
     // https://mvnrepository.com/artifact/org.flywaydb/flyway-core
     implementation("org.flywaydb:flyway-core:9.7.0")
+    testImplementation("org.flywaydb:flyway-core:9.7.0")
     // https://mvnrepository.com/artifact/com.google.inject/guice
     implementation("com.google.inject:guice:5.1.0")
 

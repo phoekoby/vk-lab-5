@@ -1,14 +1,12 @@
-import org.example.entity.Invoice;
 import org.example.entity.Organization;
 import org.junit.jupiter.api.Test;
 
-import java.sql.Date;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class OrganizationDAOTest extends AbstractDataBaseTest {
     @Test
@@ -26,74 +24,99 @@ public class OrganizationDAOTest extends AbstractDataBaseTest {
 
     @Test
     public void getById() {
-        Long existingInvoiceId = 1L;
-        Long notExistingInvoiceId = 7L;
-        Optional<Invoice> invoice1 = invoiceDAO.getById(existingInvoiceId);
-        assertTrue(invoice1.isPresent());
-        assertEquals(invoice1.get(), new Invoice(1L, 1L, Date.valueOf("2022-11-09"), 1L));
-        Optional<Invoice> invoice2 = invoiceDAO.getById(notExistingInvoiceId);
-        assertTrue(invoice2.isEmpty());
+        Long existingOrganizationId = 1L;
+        Long notExistingOrganizationId = 7L;
+        Optional<Organization> organization = organizationDAO.getById(existingOrganizationId);
+        assertTrue(organization.isPresent());
+        assertEquals(organization.get(),  new Organization(1L, 234532545L, 6234522435L));
+        Optional<Organization> organization2 = organizationDAO.getById(notExistingOrganizationId);
+        assertTrue(organization2.isEmpty());
     }
 
     @Test
     public void delete() {
-        Long existingInvoiceId = 1L;
-        Optional<Invoice> invoice1 = invoiceDAO.getById(existingInvoiceId);
-        assertTrue(invoice1.isPresent());
-        invoiceDAO.delete(existingInvoiceId);
-        invoice1 = invoiceDAO.getById(existingInvoiceId);
-        assertTrue(invoice1.isEmpty());
+        Long existingOrganizationId = 1L;
+        Optional<Organization> organization = organizationDAO.getById(existingOrganizationId);
+        assertTrue(organization.isPresent());
+        organizationDAO.delete(existingOrganizationId);
+        organization = organizationDAO.getById(existingOrganizationId);
+        assertTrue(organization.isEmpty());
     }
 
     @Test
     public void update() {
-        Invoice existingInvoice = new Invoice(1L, 1L, Date.valueOf("2022-11-09"), 1L);
-        Invoice existingChangedInvoice = new Invoice(1L, 1L, Date.valueOf("2022-11-11"), 2L);
-        Invoice notExistingInvoice = new Invoice(7L, 1L, Date.valueOf("2022-11-09"), 1L);
+        Organization existingOrganization = new Organization(1L, 234532545L, 6234522435L);
+        Organization existingChangedOrganization = new Organization(1L, 1L, 1L);
+        Organization notExisting= new Organization(7L, 1L, 1L);
 
-        Optional<Invoice> invoice1 = invoiceDAO.getById(existingInvoice.getId());
-        assertTrue(invoice1.isPresent());
-        assertEquals(existingInvoice, invoice1.get());
-        invoiceDAO.update(existingChangedInvoice);
-        invoice1 = invoiceDAO.getById(existingInvoice.getId());
-        assertTrue(invoice1.isPresent());
-        assertEquals(invoice1.get(), existingChangedInvoice);
+        Optional<Organization> organization = organizationDAO.getById(existingOrganization.getId());
+        assertTrue(organization.isPresent());
+        assertEquals(existingOrganization, organization.get());
+        organizationDAO.update(existingChangedOrganization);
+        organization = organizationDAO.getById(existingOrganization.getId());
+        assertTrue(organization.isPresent());
+        assertEquals(organization.get(), existingChangedOrganization);
 
-        assertThrows(IllegalArgumentException.class, () -> invoiceDAO.update(notExistingInvoice));
+        assertThrows(IllegalArgumentException.class, () -> organizationDAO.update(notExisting));
     }
 
     @Test
     public void save() {
-        Invoice notExistingInvoice = new Invoice(7L, 1L, Date.valueOf("2022-11-09"), 1L);
-        Optional<Invoice> invoice = invoiceDAO.getById(7L);
-        assertTrue(invoice.isEmpty());
+        Organization notExistingOrganization =new Organization( 232344532545L, 6234522342435L);
+        Optional<Organization> organization = organizationDAO.getById(5L);
+        assertTrue(organization.isEmpty());
 
-        invoiceDAO.save(notExistingInvoice);
-        invoice = invoiceDAO.getById(7L);
-        assertTrue(invoice.isPresent());
-        assertEquals(invoice.get(), notExistingInvoice);
+        organizationDAO.save(notExistingOrganization);
+        organization = organizationDAO.getById(5L);
+        assertTrue(organization.isPresent());
     }
 
     @Test
     public void saveAll() {
-        int sizeDbShouldBeAfterSaving = 8;
-        Invoice notExistingInvoice1 = new Invoice(7L, 1L, Date.valueOf("2022-11-09"), 1L);
-        Invoice notExistingInvoice2 = new Invoice(8L, 1L, Date.valueOf("2022-11-09"), 1L);
-        Collection<Invoice> notExistingInvoices = List.of(notExistingInvoice2, notExistingInvoice1);
-        Optional<Invoice> invoice1 = invoiceDAO.getById(7L);
-        Optional<Invoice> invoice2 = invoiceDAO.getById(8L);
-        assertTrue(invoice1.isEmpty());
-        assertTrue(invoice2.isEmpty());
+        int dbSizeBefore = organizationDAO.getAll().size();
+        int sizeDbShouldBeAfterSaving = dbSizeBefore + 2;
+        Organization notExistingOrganization1 = new Organization( 1L, 1L);
+        Organization notExistingOrganization2 = new Organization( 2L, 2L);
+        Collection<Organization> notExistingOrganizations = List.of(notExistingOrganization1, notExistingOrganization2);
+        Collection<Organization> result = organizationDAO.saveAll(notExistingOrganizations);
+        assertEquals(result.size(), 2);
+        assertEquals(sizeDbShouldBeAfterSaving, organizationDAO.getAll().size());
+    }
 
-        Collection<Invoice> result = invoiceDAO.saveAll(notExistingInvoices);
-        for (Invoice i : notExistingInvoices) {
-            Optional<Invoice> invoice = invoiceDAO.getById(i.getId());
-            assertTrue(invoice.isPresent());
-            assertTrue(notExistingInvoices.contains(invoice.get()));
-            assertTrue(result.contains(invoice.get()));
-        }
-        assertEquals(result.size(), notExistingInvoices.size());
-        assertEquals(sizeDbShouldBeAfterSaving, invoiceDAO.getAll().size());
+    @Test
+    public void findFirst10OrganizationsByProduct(){
+        Organization o1 = organizationDAO.getById(1L).get();
+        Organization o2 = organizationDAO.getById(2L).get();
+        Organization o3 = organizationDAO.getById(3L).get();
+        Organization o4 = organizationDAO.getById(4L).get();
+        List<Organization> forProduct1 = List.of(o3, o1, o2, o4);
+        List<Organization> forProduct2 = List.of(o2, o1, o3, o4);
+        List<Organization> forProduct3 = List.of(o1, o2, o3, o4);
+        List<Organization> forProduct4 = List.of(o1, o2, o3, o4);
+
+
+        assertEquals(forProduct1, organizationDAO.findFirst10OrganizationsByProduct(1L));
+        assertEquals(forProduct2, organizationDAO.findFirst10OrganizationsByProduct(2L));
+        assertEquals(forProduct3, organizationDAO.findFirst10OrganizationsByProduct(3L));
+        assertEquals(forProduct4, organizationDAO.findFirst10OrganizationsByProduct(4L));
+    }
+
+    @Test
+    public void findOrganizationAmountProductMoreThanValue(){
+        Map<Long, Integer> testData1 = Map.of(3L, 500, 2L, 7);
+        Map<Long, Integer> testData2 = Map.of(1L, 10000);
+        Map<Long, Integer> testData3 = Map.of(1L, 1000000);
+        Map<Long, Integer> testData4 = Map.of(1L, 1);
+
+        Organization o1 = organizationDAO.getById(1L).get();
+        Organization o2 = organizationDAO.getById(2L).get();
+        Organization o3 = organizationDAO.getById(3L).get();
+        Organization o4 = organizationDAO.getById(4L).get();
+
+        assertTrue(organizationDAO.findOrganizationAmountProductMoreThanValue(testData1).contains(o1));
+        assertTrue(organizationDAO.findOrganizationAmountProductMoreThanValue(testData2).contains(o3));
+        assertTrue(organizationDAO.findOrganizationAmountProductMoreThanValue(testData3).isEmpty());
+        assertTrue(organizationDAO.findOrganizationAmountProductMoreThanValue(testData4).containsAll(List.of(o1, o2,o3)));
     }
 
 }

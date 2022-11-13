@@ -4,8 +4,6 @@ import com.google.inject.Inject;
 import org.example.config.DBCredentials;
 import org.flywaydb.core.Flyway;
 
-import static org.example.config.DbConstants.*;
-import static org.example.config.DbConstants.PASSWORD;
 
 public class TestMigrationService {
     private final DBCredentials dbCredentials;
@@ -19,7 +17,7 @@ public class TestMigrationService {
                 .configure()
                 .dataSource(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
                         dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())
-                .locations("db")
+                .locations("test-migrations")
                 .load();
         flyway.migrate();
     }
@@ -30,7 +28,7 @@ public class TestMigrationService {
                 .dataSource(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
                         dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())
                 .cleanDisabled(false)
-                .locations("db")
+                .locations("test-migrations")
                 .load();
         flyway.clean();
     }

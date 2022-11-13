@@ -12,8 +12,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-import static org.example.config.DbConstants.*;
-
 @SuppressWarnings("FieldCanBeLocal")
 public class OrganizationDAOImpl implements OrganizationDAO {
     private final String sqlGetAllOrganizations = """

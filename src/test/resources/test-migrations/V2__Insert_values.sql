@@ -22,9 +22,9 @@ INSERT INTO invoice_position(price, product_id, invoice_id, amount) VALUES (10, 
 INSERT INTO invoice_position(price, product_id, invoice_id, amount) VALUES (100, 1, 2, 10);
 INSERT INTO invoice_position(price, product_id, invoice_id, amount) VALUES (10, 1, 3, 1000);
 INSERT INTO invoice_position(price, product_id, invoice_id, amount) VALUES (100, 1, 1, 1000);
-INSERT INTO invoice_position(price, product_id, invoice_id, amount) VALUES (100, 1, 1, 1000);
-INSERT INTO invoice_position(price, product_id, invoice_id, amount) VALUES (100, 1, 4, 10000);
+INSERT INTO invoice_position(price, product_id, invoice_id, amount) VALUES (100, 1, 4, 1000);
+INSERT INTO invoice_position(price, product_id, invoice_id, amount) VALUES (125, 1, 4, 10000);
 INSERT INTO invoice_position(price, product_id, invoice_id, amount) VALUES (100, 1, 5, 10000);
-INSERT INTO invoice_position(price, product_id, invoice_id, amount) VALUES (100, 1, 6, 1000);
+INSERT INTO invoice_position(price, product_id, invoice_id, amount) VALUES (100, 2, 6, 1000);
 INSERT INTO invoice_position(price, product_id, invoice_id, amount) VALUES (100, 1, 1, 1000);
 INSERT INTO invoice_position(price, product_id, invoice_id, amount) VALUES (100, 1, 1, 1000);
