@@ -2,23 +2,23 @@ package org.example.mapper;
 
 
 import generated.tables.records.InvoicePositionRecord;
-import org.example.entity.InvoicePosition;
+import org.example.entity.InvoicePositionDTO;
 
-public class InvoicePositionMapper implements Mapper<InvoicePositionRecord, InvoicePosition> {
+public class InvoicePositionMapper implements Mapper<InvoicePositionRecord, InvoicePositionDTO> {
     @Override
-    public InvoicePositionRecord toRecord(InvoicePosition invoicePosition) {
+    public InvoicePositionRecord toRecord(InvoicePositionDTO invoicePositionDTO) {
         final InvoicePositionRecord invoicePositionRecord = new InvoicePositionRecord();
-        invoicePositionRecord.setId(invoicePosition.getId());
-        invoicePositionRecord.setInvoiceId(invoicePosition.getInvoiceId());
-        invoicePositionRecord.setAmount(invoicePosition.getAmount());
-        invoicePositionRecord.setPrice(invoicePosition.getPrice());
-        invoicePositionRecord.setProductId(invoicePosition.getProductId());
+        invoicePositionRecord.setId(invoicePositionDTO.getId());
+        invoicePositionRecord.setInvoiceId(invoicePositionDTO.getInvoiceId());
+        invoicePositionRecord.setAmount(invoicePositionDTO.getAmount());
+        invoicePositionRecord.setPrice(invoicePositionDTO.getPrice());
+        invoicePositionRecord.setProductId(invoicePositionDTO.getProductId());
         return invoicePositionRecord;
     }
 
     @Override
-    public InvoicePosition toEntity(InvoicePositionRecord invoicePositionRecord) {
-        return new InvoicePosition(
+    public InvoicePositionDTO toEntity(InvoicePositionRecord invoicePositionRecord) {
+        return new InvoicePositionDTO(
                 invoicePositionRecord.getId(),
                 invoicePositionRecord.getPrice(),
                 invoicePositionRecord.getAmount(),

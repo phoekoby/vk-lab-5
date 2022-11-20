@@ -2,11 +2,9 @@ package org.example.dao.impl;
 
 import com.google.inject.Inject;
 import generated.tables.records.InvoicePositionRecord;
-import generated.tables.records.InvoiceRecord;
 import org.example.config.DBCredentials;
 import org.example.dao.InvoicePositionDAO;
-import org.example.entity.InvoicePosition;
-import org.example.mapper.InvoiceMapper;
+import org.example.entity.InvoicePositionDTO;
 import org.example.mapper.InvoicePositionMapper;
 import org.jetbrains.annotations.NotNull;
 import org.jooq.DSLContext;
@@ -19,7 +17,6 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static generated.Tables.INVOICE;
 import static generated.Tables.INVOICE_POSITION;
 
 public class InvoicePositionJooqDAOImpl implements InvoicePositionDAO {
@@ -35,7 +32,7 @@ public class InvoicePositionJooqDAOImpl implements InvoicePositionDAO {
     }
 
     @Override
-    public Collection<InvoicePosition> getAll() {
+    public Collection<InvoicePositionDTO> getAll() {
         try (Connection conn = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
                 dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
@@ -52,7 +49,7 @@ public class InvoicePositionJooqDAOImpl implements InvoicePositionDAO {
     }
 
     @Override
-    public Optional<InvoicePosition> getById(@NotNull Long id) {
+    public Optional<InvoicePositionDTO> getById(@NotNull Long id) {
         try (Connection conn = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
                 dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
@@ -85,7 +82,7 @@ public class InvoicePositionJooqDAOImpl implements InvoicePositionDAO {
     }
 
     @Override
-    public InvoicePosition update(@NotNull InvoicePosition value) {
+    public InvoicePositionDTO update(@NotNull InvoicePositionDTO value) {
         if(value.getId() == null || getById(value.getId()).isEmpty()){
             throw new IllegalArgumentException("Row with this id is not existing");
         }
@@ -109,7 +106,7 @@ public class InvoicePositionJooqDAOImpl implements InvoicePositionDAO {
     }
 
     @Override
-    public InvoicePosition save(@NotNull InvoicePosition value) {
+    public InvoicePositionDTO save(@NotNull InvoicePositionDTO value) {
         try (Connection conn = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
                 dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
@@ -125,8 +122,4 @@ public class InvoicePositionJooqDAOImpl implements InvoicePositionDAO {
         }
     }
 
-    @Override
-    public Collection<InvoicePosition> saveAll(@NotNull Collection<InvoicePosition> values) {
-        return values.stream().map(this::save).collect(Collectors.toList());
-    }
 }

@@ -6,18 +6,18 @@ import org.jetbrains.annotations.NotNull;
 import java.io.Serializable;
 
 @Data
-public final class Organization implements Serializable, Comparable<Organization> {
+public final class OrganizationDTO implements Serializable, Comparable<OrganizationDTO> {
     private final Long id;
     private final Long INN;
     private final Long checkingAccount;
 
-    public Organization(Long INN, Long checkingAccount) {
+    public OrganizationDTO(Long INN, Long checkingAccount) {
         this.id = null;
         this.INN = INN;
         this.checkingAccount = checkingAccount;
     }
 
-    public Organization(Long id, Long INN, Long checkingAccount) {
+    public OrganizationDTO(Long id, Long INN, Long checkingAccount) {
         this.id = id;
         this.INN = INN;
         this.checkingAccount = checkingAccount;
@@ -25,7 +25,7 @@ public final class Organization implements Serializable, Comparable<Organization
 
 
     @Override
-    public int compareTo(@NotNull Organization o) {
+    public int compareTo(@NotNull OrganizationDTO o) {
         if (this.id == null && o.id == null) {
             return 0;
         } else if (this.id == null) {

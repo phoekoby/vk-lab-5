@@ -1,6 +1,6 @@
 package org.example.dao;
 
-import org.example.entity.Invoice;
+import org.example.entity.InvoiceDTO;
 
-public interface InvoiceDAO extends CrudDAO<Invoice, Long> {
+public interface InvoiceDAO extends CrudDAO<InvoiceDTO, Long> {
 }

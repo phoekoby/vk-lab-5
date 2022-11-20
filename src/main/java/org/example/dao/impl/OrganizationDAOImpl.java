@@ -3,7 +3,7 @@ package org.example.dao.impl;
 import com.google.inject.Inject;
 import org.example.config.DBCredentials;
 import org.example.dao.OrganizationDAO;
-import org.example.entity.Organization;
+import org.example.entity.OrganizationDTO;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.DriverManager;
@@ -60,7 +60,7 @@ public class OrganizationDAOImpl implements OrganizationDAO {
                   from invoice_position
                   where invoice_id in
                         (SELECT id
-                         from invoice inv
+                         from invoiceDTO inv
                          where org.id = inv.sender_id) and product_id = ?) > ?)
             """;
 
@@ -71,7 +71,7 @@ public class OrganizationDAOImpl implements OrganizationDAO {
         this.dbCredentials = dbCredentials;
     }
     @Override
-    public Collection<Organization> getAll() {
+    public Collection<OrganizationDTO> getAll() {
         try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
                 dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlGetAllOrganizations)) {
@@ -85,20 +85,20 @@ public class OrganizationDAOImpl implements OrganizationDAO {
     }
 
     @Override
-    public Optional<Organization> getById(@NotNull Long id) {
+    public Optional<OrganizationDTO> getById(@NotNull Long id) {
         try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
                 dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlGetByIdOrganization)) {
                 statement.setLong(1, id);
                 try (ResultSet resultSet = statement.executeQuery()) {
-                    Organization organization = null;
+                    OrganizationDTO organizationDTO = null;
                     while (resultSet.next()) {
                         final Long idO = resultSet.getLong("id");
                         final Long inn = resultSet.getLong("inn");
                         final Long checkingAccount = resultSet.getLong("checking_account");
-                        organization = new Organization(idO, inn, checkingAccount);
+                        organizationDTO = new OrganizationDTO(idO, inn, checkingAccount);
                     }
-                    return Optional.ofNullable(organization);
+                    return Optional.ofNullable(organizationDTO);
                 }
             }
         } catch (SQLException e) {
@@ -120,7 +120,7 @@ public class OrganizationDAOImpl implements OrganizationDAO {
     }
 
     @Override
-    public Organization update(@NotNull Organization value) {
+    public OrganizationDTO update(@NotNull OrganizationDTO value) {
         if(value.getId() == null || getById(value.getId()).isEmpty()){
             throw new IllegalArgumentException("Row with this id is not existing");
         }
@@ -139,7 +139,7 @@ public class OrganizationDAOImpl implements OrganizationDAO {
     }
 
     @Override
-    public Organization save(@NotNull Organization value) {
+    public OrganizationDTO save(@NotNull OrganizationDTO value) {
         try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
                 dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlInsert)) {
@@ -154,16 +154,16 @@ public class OrganizationDAOImpl implements OrganizationDAO {
     }
 
     @Override
-    public Collection<Organization> saveAll(@NotNull Collection<Organization> values) {
-        Collection<Organization> result = new ArrayList<>();
-        for (Organization value : values) {
+    public Collection<OrganizationDTO> saveAll(@NotNull Collection<OrganizationDTO> values) {
+        Collection<OrganizationDTO> result = new ArrayList<>();
+        for (OrganizationDTO value : values) {
             result.add(save(value));
         }
         return result;
     }
 
     @Override
-    public List<Organization> findFirst10OrganizationsByProduct(@NotNull Long productId) {
+    public List<OrganizationDTO> findFirst10OrganizationsByProduct(@NotNull Long productId) {
         try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
                 dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlFindFirst10OrganizationsByProduct)) {
@@ -178,7 +178,7 @@ public class OrganizationDAOImpl implements OrganizationDAO {
     }
 
     @Override
-    public List<Organization> findOrganizationAmountProductMoreThanValue(@NotNull Map<Long, Integer> productsWithLimits) {
+    public List<OrganizationDTO> findOrganizationAmountProductMoreThanValue(@NotNull Map<Long, Integer> productsWithLimits) {
         if (productsWithLimits.isEmpty()) {
             throw new IllegalArgumentException("Request can not be with empty limits");
         }
@@ -206,13 +206,13 @@ public class OrganizationDAOImpl implements OrganizationDAO {
     }
 
 
-    private List<Organization> collectToListOrganizations(ResultSet resultSet) throws SQLException {
-        List<Organization> result = new ArrayList<>();
+    private List<OrganizationDTO> collectToListOrganizations(ResultSet resultSet) throws SQLException {
+        List<OrganizationDTO> result = new ArrayList<>();
         while (resultSet.next()) {
             final Long id = resultSet.getLong("id");
             final Long inn = resultSet.getLong("inn");
             final Long checkingAccount = resultSet.getLong("checking_account");
-            result.add(new Organization(id, inn, checkingAccount));
+            result.add(new OrganizationDTO(id, inn, checkingAccount));
         }
         return result;
     }

@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public interface CrudDAO<V, K> {
     Collection<V> getAll();
@@ -16,5 +17,10 @@ public interface CrudDAO<V, K> {
 
     V save(@NotNull V value);
 
-    Collection<V> saveAll(@NotNull Collection<V> values);
+    default Collection<V> saveAll(@NotNull Collection<V> values){
+        return values
+                .stream()
+                .map(this::save)
+                .collect(Collectors.toList());
+    }
 }

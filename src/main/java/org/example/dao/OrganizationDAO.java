@@ -1,14 +1,14 @@
 package org.example.dao;
 
-import org.example.entity.Organization;
+import org.example.entity.OrganizationDTO;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
 
-public interface OrganizationDAO extends CrudDAO<Organization, Long> {
+public interface OrganizationDAO extends CrudDAO<OrganizationDTO, Long> {
 
-    List<Organization> findFirst10OrganizationsByProduct(@NotNull Long productId);
+    List<OrganizationDTO> findFirst10OrganizationsByProduct(@NotNull Long productId);
 
-    List<Organization> findOrganizationAmountProductMoreThanValue(@NotNull Map<Long, Integer> productsWithLimits);
+    List<OrganizationDTO> findOrganizationAmountProductMoreThanValue(@NotNull Map<Long, Integer> productsWithLimits);
 }

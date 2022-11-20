@@ -5,7 +5,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public final class InvoicePosition implements Serializable {
+public final class InvoicePositionDTO implements Serializable {
     private final Long id;
     private final Double price;
     private final Integer amount;
@@ -13,7 +13,7 @@ public final class InvoicePosition implements Serializable {
     private final Long invoiceId;
 
 
-    public InvoicePosition(Long id, Double price, Integer amount, Long productId, Long invoiceId) {
+    public InvoicePositionDTO(Long id, Double price, Integer amount, Long productId, Long invoiceId) {
         this.id = id;
         this.price = price;
         this.amount = amount;
@@ -21,7 +21,7 @@ public final class InvoicePosition implements Serializable {
         this.invoiceId = invoiceId;
     }
 
-    public InvoicePosition(Double price, Integer amount, Long productId, Long invoiceId) {
+    public InvoicePositionDTO(Double price, Integer amount, Long productId, Long invoiceId) {
         this.id = null;
         this.price = price;
         this.amount = amount;

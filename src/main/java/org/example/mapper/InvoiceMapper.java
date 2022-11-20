@@ -1,25 +1,23 @@
 package org.example.mapper;
 
 import generated.tables.records.InvoiceRecord;
-import org.example.entity.Invoice;
+import org.example.entity.InvoiceDTO;
 
 import java.sql.Date;
-import java.time.LocalDate;
-import java.util.Map;
 
-public class InvoiceMapper implements Mapper<InvoiceRecord, Invoice> {
+public class InvoiceMapper implements Mapper<InvoiceRecord, InvoiceDTO> {
     @Override
-    public InvoiceRecord toRecord(Invoice invoice) {
+    public InvoiceRecord toRecord(InvoiceDTO invoiceDTO) {
         final InvoiceRecord invoiceRecord = new InvoiceRecord();
-        invoiceRecord.setId(invoice.getId());
-        invoiceRecord.setNumber(invoice.getNumber());
-        invoiceRecord.setInvoiceDate(invoice.getInvoiceDate().toLocalDate());
-        invoiceRecord.setSenderId(invoice.getSenderId());
+        invoiceRecord.setId(invoiceDTO.getId());
+        invoiceRecord.setNumber(invoiceDTO.getNumber());
+        invoiceRecord.setInvoiceDate(invoiceDTO.getInvoiceDate().toLocalDate());
+        invoiceRecord.setSenderId(invoiceDTO.getSenderId());
         return invoiceRecord;
     }
 
     @Override
-    public Invoice toEntity(InvoiceRecord invoiceRecord) {
-        return new Invoice(invoiceRecord.getId(), invoiceRecord.getNumber(), Date.valueOf(invoiceRecord.getInvoiceDate()), invoiceRecord.getSenderId());
+    public InvoiceDTO toEntity(InvoiceRecord invoiceRecord) {
+        return new InvoiceDTO(invoiceRecord.getId(), invoiceRecord.getNumber(), Date.valueOf(invoiceRecord.getInvoiceDate()), invoiceRecord.getSenderId());
     }
 }

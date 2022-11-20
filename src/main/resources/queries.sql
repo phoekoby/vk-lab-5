@@ -79,6 +79,6 @@ SELECT o.id,
                                                      FROM invoice i
                                                      WHERE i.invoice_date >= '2022-11-09'
                                                        AND i.invoice_date <= '2022-11-12'
-                                                       AND i.sender_id = o.id)))) as products
+                                                       AND i.sender_id = o.id)))) as productDTOS
 FROM organization o;
 

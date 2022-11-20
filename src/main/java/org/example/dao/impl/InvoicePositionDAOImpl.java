@@ -3,7 +3,7 @@ package org.example.dao.impl;
 import com.google.inject.Inject;
 import org.example.config.DBCredentials;
 import org.example.dao.InvoicePositionDAO;
-import org.example.entity.InvoicePosition;
+import org.example.entity.InvoicePositionDTO;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.DriverManager;
@@ -42,7 +42,7 @@ public class InvoicePositionDAOImpl implements InvoicePositionDAO {
         this.dbCredentials = dbCredentials;
     }
     @Override
-    public List<InvoicePosition> getAll() {
+    public List<InvoicePositionDTO> getAll() {
         try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
                 dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlGetAllInvoicePosition)) {
@@ -56,22 +56,22 @@ public class InvoicePositionDAOImpl implements InvoicePositionDAO {
     }
 
     @Override
-    public Optional<InvoicePosition> getById(@NotNull Long id) {
+    public Optional<InvoicePositionDTO> getById(@NotNull Long id) {
         try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
                 dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlGetByIdInvoicePosition)) {
                 statement.setLong(1, id);
                 try (ResultSet resultSet = statement.executeQuery()) {
-                    InvoicePosition invoicePosition = null;
+                    InvoicePositionDTO invoicePositionDTO = null;
                     while (resultSet.next()) {
                         final Long id0 = resultSet.getLong("id");
                         final Double price = resultSet.getDouble("price");
                         final Integer amount = resultSet.getInt("amount");
                         final Long productId = resultSet.getLong("product_id");
                         final Long invoiceId = resultSet.getLong("invoice_id");
-                        invoicePosition = new InvoicePosition(id0, price, amount, productId, invoiceId);
+                        invoicePositionDTO = new InvoicePositionDTO(id0, price, amount, productId, invoiceId);
                     }
-                    return Optional.ofNullable(invoicePosition);
+                    return Optional.ofNullable(invoicePositionDTO);
                 }
             }
         } catch (SQLException e) {
@@ -93,7 +93,7 @@ public class InvoicePositionDAOImpl implements InvoicePositionDAO {
     }
 
     @Override
-    public InvoicePosition update(@NotNull InvoicePosition value) {
+    public InvoicePositionDTO update(@NotNull InvoicePositionDTO value) {
         if(value.getId() == null || getById(value.getId()).isEmpty()){
             throw new IllegalArgumentException("Row with this id is not existing");
         }
@@ -114,7 +114,7 @@ public class InvoicePositionDAOImpl implements InvoicePositionDAO {
     }
 
     @Override
-    public InvoicePosition save(@NotNull InvoicePosition value) {
+    public InvoicePositionDTO save(@NotNull InvoicePositionDTO value) {
         try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
                 dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlInsert)) {
@@ -131,24 +131,24 @@ public class InvoicePositionDAOImpl implements InvoicePositionDAO {
     }
 
     @Override
-    public Collection<InvoicePosition> saveAll(@NotNull Collection<InvoicePosition> values) {
-        Collection<InvoicePosition> result = new ArrayList<>();
-        for (InvoicePosition value : values) {
+    public Collection<InvoicePositionDTO> saveAll(@NotNull Collection<InvoicePositionDTO> values) {
+        Collection<InvoicePositionDTO> result = new ArrayList<>();
+        for (InvoicePositionDTO value : values) {
             result.add(save(value));
         }
         return result;
     }
 
 
-    private List<InvoicePosition> collectToListInvoicePositions(ResultSet resultSet) throws SQLException {
-        List<InvoicePosition> result = new ArrayList<>();
+    private List<InvoicePositionDTO> collectToListInvoicePositions(ResultSet resultSet) throws SQLException {
+        List<InvoicePositionDTO> result = new ArrayList<>();
         while (resultSet.next()) {
             final Long id = resultSet.getLong("id");
             final Double price = resultSet.getDouble("price");
             final Integer amount = resultSet.getInt("amount");
             final Long productId = resultSet.getLong("product_id");
             final Long invoiceId = resultSet.getLong("invoice_id");
-            result.add(new InvoicePosition(id, price, amount, productId, invoiceId));
+            result.add(new InvoicePositionDTO(id, price, amount, productId, invoiceId));
         }
         return result;
     }

@@ -4,11 +4,10 @@ import com.google.inject.Inject;
 import generated.tables.records.InvoiceRecord;
 import org.example.config.DBCredentials;
 import org.example.dao.InvoiceDAO;
-import org.example.entity.Invoice;
+import org.example.entity.InvoiceDTO;
 import org.example.mapper.InvoiceMapper;
 import org.jetbrains.annotations.NotNull;
 import org.jooq.DSLContext;
-import org.jooq.Result;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 
@@ -31,7 +30,7 @@ public class InvoiceJooqDAOImpl implements InvoiceDAO {
         this.invoiceMapper = invoiceMapper;
     }
     @Override
-    public Collection<Invoice> getAll() {
+    public Collection<InvoiceDTO> getAll() {
         try (Connection conn = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
                 dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
@@ -48,7 +47,7 @@ public class InvoiceJooqDAOImpl implements InvoiceDAO {
     }
 
     @Override
-    public Optional<Invoice> getById(@NotNull Long id) {
+    public Optional<InvoiceDTO> getById(@NotNull Long id) {
         try (Connection conn = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
                 dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
@@ -81,7 +80,7 @@ public class InvoiceJooqDAOImpl implements InvoiceDAO {
     }
 
     @Override
-    public Invoice update(@NotNull Invoice value) {
+    public InvoiceDTO update(@NotNull InvoiceDTO value) {
         if(value.getId() == null || getById(value.getId()).isEmpty()){
             throw new IllegalArgumentException("Row with this id is not existing");
         }
@@ -104,7 +103,7 @@ public class InvoiceJooqDAOImpl implements InvoiceDAO {
     }
 
     @Override
-    public Invoice save(@NotNull Invoice value) {
+    public InvoiceDTO save(@NotNull InvoiceDTO value) {
         try (Connection conn = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
                 dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             final DSLContext context = DSL.using(conn, SQLDialect.POSTGRES);
@@ -120,11 +119,4 @@ public class InvoiceJooqDAOImpl implements InvoiceDAO {
         }
     }
 
-    @Override
-    public Collection<Invoice> saveAll(@NotNull Collection<Invoice> values) {
-        return values
-                .stream()
-                .map(this::save)
-                .collect(Collectors.toList());
-    }
 }

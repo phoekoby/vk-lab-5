@@ -5,8 +5,8 @@ import org.example.config.DBCredentials;
 import org.example.dao.ProductDAO;
 import org.example.dto.AmountSumDTO;
 import org.example.dto.PeriodAmountSumAndResultProductDTO;
-import org.example.entity.Organization;
-import org.example.entity.Product;
+import org.example.entity.OrganizationDTO;
+import org.example.entity.ProductDTO;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.Date;
@@ -82,7 +82,7 @@ public class ProductDAOImpl implements ProductDAO {
                                                                  FROM invoice i
                                                                  WHERE i.invoice_date >= ?
                                                                    AND i.invoice_date <= ?
-                                                                   AND i.sender_id = o.id)))) as products
+                                                                   AND i.sender_id = o.id)))) as productDTOS
             FROM organization o;
             """;
 
@@ -95,7 +95,7 @@ public class ProductDAOImpl implements ProductDAO {
     }
 
     @Override
-    public List<Product> getAll() {
+    public List<ProductDTO> getAll() {
         try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
                 dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlGetAllProducts)) {
@@ -109,20 +109,20 @@ public class ProductDAOImpl implements ProductDAO {
     }
 
     @Override
-    public Optional<Product> getById(@NotNull Long id) {
+    public Optional<ProductDTO> getById(@NotNull Long id) {
         try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
                 dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlGetByIdProduct)) {
                 statement.setLong(1, id);
                 try (ResultSet resultSet = statement.executeQuery()) {
-                    Product product = null;
+                    ProductDTO productDTO = null;
                     while (resultSet.next()) {
                         final Long id0 = resultSet.getLong("id");
                         final String name = resultSet.getString("name");
                         final Long internalCode = resultSet.getLong("internal_code");
-                        product = new Product(id0, name, internalCode);
+                        productDTO = new ProductDTO(id0, name, internalCode);
                     }
-                    return Optional.ofNullable(product);
+                    return Optional.ofNullable(productDTO);
                 }
             }
         } catch (SQLException e) {
@@ -144,7 +144,7 @@ public class ProductDAOImpl implements ProductDAO {
     }
 
     @Override
-    public Product update(@NotNull Product value) {
+    public ProductDTO update(@NotNull ProductDTO value) {
         if (value.getId() == null || getById(value.getId()).isEmpty()) {
             throw new IllegalArgumentException("Row with this id is not existing");
         }
@@ -163,7 +163,7 @@ public class ProductDAOImpl implements ProductDAO {
     }
 
     @Override
-    public Product save(@NotNull Product value) {
+    public ProductDTO save(@NotNull ProductDTO value) {
         try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
                 dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlInsert)) {
@@ -178,9 +178,9 @@ public class ProductDAOImpl implements ProductDAO {
     }
 
     @Override
-    public Collection<Product> saveAll(@NotNull Collection<Product> values) {
-        Collection<Product> result = new ArrayList<>();
-        for (Product value : values) {
+    public Collection<ProductDTO> saveAll(@NotNull Collection<ProductDTO> values) {
+        Collection<ProductDTO> result = new ArrayList<>();
+        for (ProductDTO value : values) {
             result.add(save(value));
         }
         return result;
@@ -190,8 +190,8 @@ public class ProductDAOImpl implements ProductDAO {
     public PeriodAmountSumAndResultProductDTO getAmountAndSumPerDayAndResultForPeriod(Date floor, Date roof) {
         try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
                 dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
-            final Map<Date, Map<Product, AmountSumDTO>> productPerDay = productPerDay(connection, floor, roof);
-            final Map<Product, AmountSumDTO> amountSumResultForPeriod = amountSumResultForPeriod(connection, floor, roof);
+            final Map<Date, Map<ProductDTO, AmountSumDTO>> productPerDay = productPerDay(connection, floor, roof);
+            final Map<ProductDTO, AmountSumDTO> amountSumResultForPeriod = amountSumResultForPeriod(connection, floor, roof);
             return new PeriodAmountSumAndResultProductDTO(productPerDay, amountSumResultForPeriod);
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -199,10 +199,10 @@ public class ProductDAOImpl implements ProductDAO {
     }
 
     @Override
-    public Map<Product, Double> getAveragePriceForProductsInPeriod(Date floor, Date roof) {
+    public Map<ProductDTO, Double> getAveragePriceForProductsInPeriod(Date floor, Date roof) {
         try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
                 dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
-            final Map<Product, Double> productWithAveragePrice = new HashMap<>();
+            final Map<ProductDTO, Double> productWithAveragePrice = new HashMap<>();
             try (PreparedStatement statement = connection.prepareStatement(sqlAveragePriceForProductInPeriod)) {
                 statement.setDate(1, floor);
                 statement.setDate(2, roof);
@@ -212,8 +212,8 @@ public class ProductDAOImpl implements ProductDAO {
                         final Long internalCode = resultSet.getLong("internal_code");
                         final String name = resultSet.getString("name");
                         final Double averagePrice = resultSet.getDouble("avg");
-                        Product product = new Product(productId, name, internalCode);
-                        productWithAveragePrice.put(product, averagePrice);
+                        ProductDTO productDTO = new ProductDTO(productId, name, internalCode);
+                        productWithAveragePrice.put(productDTO, averagePrice);
                     }
                 }
                 return productWithAveragePrice;
@@ -224,10 +224,10 @@ public class ProductDAOImpl implements ProductDAO {
     }
 
     @Override
-    public Map<Organization, List<Product>> getDeliveredProductsByOrganizationInPeriod(Date floor, Date roof) {
+    public Map<OrganizationDTO, List<ProductDTO>> getDeliveredProductsByOrganizationInPeriod(Date floor, Date roof) {
         try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
                 dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
-            final Map<Organization, List<Product>> organizationsWithDeliveredProducts = new TreeMap<>();
+            final Map<OrganizationDTO, List<ProductDTO>> organizationsWithDeliveredProducts = new TreeMap<>();
             try (PreparedStatement statement = connection.prepareStatement(sqlOrganizationsWithDeliveredProducts)) {
                 statement.setDate(1, floor);
                 statement.setDate(2, roof);
@@ -236,16 +236,16 @@ public class ProductDAOImpl implements ProductDAO {
                         final Long organizationId = resultSet.getLong("id");
                         final Long inn = resultSet.getLong("inn");
                         final Long checkingAccount = resultSet.getLong("checking_account");
-                        final Array products = resultSet.getArray("products");
-                        Organization organization = new Organization(organizationId, inn, checkingAccount);
-                        List<Product> productsList;
-                        Long[] productsId = (Long[]) products.getArray();
+                        final Array productDTOS = resultSet.getArray("productDTOS");
+                        OrganizationDTO organizationDTO = new OrganizationDTO(organizationId, inn, checkingAccount);
+                        List<ProductDTO> productsList;
+                        Long[] productsId = (Long[]) productDTOS.getArray();
                         productsList = Arrays
                                 .stream(productsId)
                                 .map(this::getById)
                                 .map(Optional::get)
                                 .collect(Collectors.toList());
-                        organizationsWithDeliveredProducts.put(organization, productsList);
+                        organizationsWithDeliveredProducts.put(organizationDTO, productsList);
                     }
                 }
                 return organizationsWithDeliveredProducts;
@@ -255,8 +255,8 @@ public class ProductDAOImpl implements ProductDAO {
         }
     }
 
-    private Map<Date, Map<Product, AmountSumDTO>> productPerDay(Connection connection, Date floor, Date roof) throws SQLException {
-        final Map<Date, Map<Product, AmountSumDTO>> productPerDay = new TreeMap<>();
+    private Map<Date, Map<ProductDTO, AmountSumDTO>> productPerDay(Connection connection, Date floor, Date roof) throws SQLException {
+        final Map<Date, Map<ProductDTO, AmountSumDTO>> productPerDay = new TreeMap<>();
         try (PreparedStatement statement = connection.prepareStatement(sqlAmountSumInPeriod)) {
             statement.setDate(1, floor);
             statement.setDate(2, roof);
@@ -271,9 +271,9 @@ public class ProductDAOImpl implements ProductDAO {
                     if (!productPerDay.containsKey(invoiceDate)) {
                         productPerDay.put(invoiceDate, new HashMap<>());
                     }
-                    Map<Product, AmountSumDTO> amountAndSumProduct = productPerDay.get(invoiceDate);
-                    Product product = new Product(productId, name, internalCode);
-                    amountAndSumProduct.put(product, new AmountSumDTO(amount, sum));
+                    Map<ProductDTO, AmountSumDTO> amountAndSumProduct = productPerDay.get(invoiceDate);
+                    ProductDTO productDTO = new ProductDTO(productId, name, internalCode);
+                    amountAndSumProduct.put(productDTO, new AmountSumDTO(amount, sum));
                 }
 
             }
@@ -281,8 +281,8 @@ public class ProductDAOImpl implements ProductDAO {
         }
     }
 
-    private Map<Product, AmountSumDTO> amountSumResultForPeriod(Connection connection, Date floor, Date roof) throws SQLException {
-        final Map<Product, AmountSumDTO> amountSumResultForPeriod = new HashMap<>();
+    private Map<ProductDTO, AmountSumDTO> amountSumResultForPeriod(Connection connection, Date floor, Date roof) throws SQLException {
+        final Map<ProductDTO, AmountSumDTO> amountSumResultForPeriod = new HashMap<>();
         try (PreparedStatement statement = connection.prepareStatement(sqlAmountSumResultInPeriod)) {
             statement.setDate(1, floor);
             statement.setDate(2, roof);
@@ -293,21 +293,21 @@ public class ProductDAOImpl implements ProductDAO {
                     final String name = resultSet.getString("name");
                     final Integer amount = resultSet.getInt("amount");
                     final Double sum = resultSet.getDouble("sum");
-                    Product product = new Product(productId, name, internalCode);
-                    amountSumResultForPeriod.put(product, new AmountSumDTO(amount, sum));
+                    ProductDTO productDTO = new ProductDTO(productId, name, internalCode);
+                    amountSumResultForPeriod.put(productDTO, new AmountSumDTO(amount, sum));
                 }
             }
             return amountSumResultForPeriod;
         }
     }
 
-    private List<Product> collectToListProducts(ResultSet resultSet) throws SQLException {
-        List<Product> result = new ArrayList<>();
+    private List<ProductDTO> collectToListProducts(ResultSet resultSet) throws SQLException {
+        List<ProductDTO> result = new ArrayList<>();
         while (resultSet.next()) {
             final Long id = resultSet.getLong("id");
             final String name = resultSet.getString("name");
             final Long internalCode = resultSet.getLong("internal_code");
-            result.add(new Product(id, name, internalCode));
+            result.add(new ProductDTO(id, name, internalCode));
         }
         return result;
     }

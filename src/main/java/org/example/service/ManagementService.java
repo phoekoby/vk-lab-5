@@ -4,10 +4,10 @@ import org.example.dao.InvoiceDAO;
 import org.example.dao.InvoicePositionDAO;
 import org.example.dao.OrganizationDAO;
 import org.example.dao.ProductDAO;
-import org.example.entity.Invoice;
-import org.example.entity.InvoicePosition;
-import org.example.entity.Organization;
-import org.example.entity.Product;
+import org.example.entity.InvoiceDTO;
+import org.example.entity.InvoicePositionDTO;
+import org.example.entity.OrganizationDTO;
+import org.example.entity.ProductDTO;
 import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Inject;
@@ -33,42 +33,42 @@ public class ManagementService {
     }
 
     public void printAllProducts() {
-        List<Product> products = productDAO
+        List<ProductDTO> productDTOS = productDAO
                 .getAll()
                 .stream()
                 .toList();
         System.out.println("---------- All Products ----------");
-        products.forEach(System.out::println);
+        productDTOS.forEach(System.out::println);
         System.out.println("----------------------------------");
     }
 
     public void printAllInvoices() {
-        List<Invoice> invoices = invoiceDAO
+        List<InvoiceDTO> invoiceDTOS = invoiceDAO
                 .getAll()
                 .stream()
                 .toList();
         System.out.println("---------- All Invoices ----------");
-        invoices.forEach(System.out::println);
+        invoiceDTOS.forEach(System.out::println);
         System.out.println("----------------------------------");
     }
 
     public void printAllInvoicePositions() {
-        List<InvoicePosition> invoicePositions = invoicePositionDAO
+        List<InvoicePositionDTO> invoicePositionDTOS = invoicePositionDAO
                 .getAll()
                 .stream()
                 .toList();
         System.out.println("---------- All Invoice Positions ----------");
-        invoicePositions.forEach(System.out::println);
+        invoicePositionDTOS.forEach(System.out::println);
         System.out.println("-------------------------------------------");
     }
 
     public void printAllOrganizations() {
-        List<Organization> organizations = organizationDAO
+        List<OrganizationDTO> organizationDTOS = organizationDAO
                 .getAll()
                 .stream()
                 .toList();
         System.out.println("---------- All Organizations ----------");
-        organizations.forEach(System.out::println);
+        organizationDTOS.forEach(System.out::println);
         System.out.println("---------------------------------------");
     }
 

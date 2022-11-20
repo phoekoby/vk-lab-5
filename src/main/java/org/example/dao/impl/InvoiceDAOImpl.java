@@ -3,7 +3,7 @@ package org.example.dao.impl;
 import com.google.inject.Inject;
 import org.example.config.DBCredentials;
 import org.example.dao.InvoiceDAO;
-import org.example.entity.Invoice;
+import org.example.entity.InvoiceDTO;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
@@ -40,7 +40,7 @@ public class InvoiceDAOImpl implements InvoiceDAO {
     }
 
     @Override
-    public List<Invoice> getAll() {
+    public List<InvoiceDTO> getAll() {
         try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
                 dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlGetAllInvoices)) {
@@ -54,21 +54,21 @@ public class InvoiceDAOImpl implements InvoiceDAO {
     }
 
     @Override
-    public Optional<Invoice> getById(@NotNull Long id) {
+    public Optional<InvoiceDTO> getById(@NotNull Long id) {
         try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
                 dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlGetByIdInvoice)) {
                 statement.setLong(1, id);
                 try (ResultSet resultSet = statement.executeQuery()) {
-                    Invoice invoice = null;
+                    InvoiceDTO invoiceDTO = null;
                     while (resultSet.next()) {
                         final Long id0 = resultSet.getLong("id");
                         final Long number = resultSet.getLong("number");
                         final Date invoiceDate = resultSet.getDate("invoice_date");
                         final Long senderId = resultSet.getLong("sender_id");
-                        invoice = new Invoice(id0, number, invoiceDate, senderId);
+                        invoiceDTO = new InvoiceDTO(id0, number, invoiceDate, senderId);
                     }
-                    return Optional.ofNullable(invoice);
+                    return Optional.ofNullable(invoiceDTO);
                 }
             }
         } catch (SQLException e) {
@@ -90,7 +90,7 @@ public class InvoiceDAOImpl implements InvoiceDAO {
     }
 
     @Override
-    public Invoice update(@NotNull Invoice value) {
+    public InvoiceDTO update(@NotNull InvoiceDTO value) {
         if(value.getId() == null || getById(value.getId()).isEmpty()){
             throw new IllegalArgumentException("Row with this id is not existing");
         }
@@ -110,7 +110,7 @@ public class InvoiceDAOImpl implements InvoiceDAO {
     }
 
     @Override
-    public Invoice save(@NotNull Invoice value) {
+    public InvoiceDTO save(@NotNull InvoiceDTO value) {
         try (var connection = DriverManager.getConnection(dbCredentials.getCONNECTION() + dbCredentials.getDB_NAME(),
                 dbCredentials.getUSERNAME(), dbCredentials.getPASSWORD())) {
             try (PreparedStatement statement = connection.prepareStatement(sqlInsert)) {
@@ -126,23 +126,23 @@ public class InvoiceDAOImpl implements InvoiceDAO {
     }
 
     @Override
-    public Collection<Invoice> saveAll(@NotNull Collection<Invoice> values) {
-        Collection<Invoice> result = new ArrayList<>();
-        for (Invoice value : values) {
+    public Collection<InvoiceDTO> saveAll(@NotNull Collection<InvoiceDTO> values) {
+        Collection<InvoiceDTO> result = new ArrayList<>();
+        for (InvoiceDTO value : values) {
             result.add(save(value));
         }
         return result;
     }
 
 
-    private List<Invoice> collectToListInvoices(ResultSet resultSet) throws SQLException {
-        List<Invoice> result = new ArrayList<>();
+    private List<InvoiceDTO> collectToListInvoices(ResultSet resultSet) throws SQLException {
+        List<InvoiceDTO> result = new ArrayList<>();
         while (resultSet.next()) {
             final Long id = resultSet.getLong("id");
             final Long number = resultSet.getLong("number");
             final Date invoiceDate = resultSet.getDate("invoice_date");
             final Long senderId = resultSet.getLong("sender_id");
-            result.add(new Invoice(id, number, invoiceDate, senderId));
+            result.add(new InvoiceDTO(id, number, invoiceDate, senderId));
         }
         return result;
     }
